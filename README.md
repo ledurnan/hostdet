@@ -8,9 +8,13 @@ The script attempts to gather and display various information about the host:
 - Hostname
 - IP addresses (IPv4 and IPv6)
 - System hardware details
+    - CPU
+    - Memory
+    - Storage
 - Operating system details
-- SSH configuration
-- Obfuscated authorized SSH public keys (from `~/.ssh/authorized_keys`) for each user
+- SSH
+    - configuration details from `/etc/ssh/sshd_config`
+    - obfuscated authorized SSH public keys (from `~/.ssh/authorized_keys`) for each user
 
 ## Safety and privacy
 - This script outputs various sensitive information about the host and its users

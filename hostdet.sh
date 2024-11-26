@@ -38,6 +38,7 @@ echo "Hostname: $(hostname)"
 echo
 
 run_command "RAM Information" "free -h -t"
+run_command "Disk Information" "df -h"
 run_command "Model from /proc/device-tree/model" "cat /proc/device-tree/model 2>/dev/null"
 run_command "CPU info from /proc/cpuinfo" "cat /proc/cpuinfo | grep -E 'Model|Hardware|Revision' 2>/dev/null"
 run_command "Model from /sys/firmware/devicetree/base/model" "cat /sys/firmware/devicetree/base/model 2>/dev/null"
