@@ -8,8 +8,8 @@ cat << "EOF"
  |  __  |/ _ \/ __| __| | |  | |/ _ \ __/ _ \/ __| __| \ \ / / _ \
  | |  | | (_) \__ \ |_  | |__| |  __/ ||  __/ (__| |_| |\ V /  __/
  |_|  |_|\___/|___/\__| |_____/ \___|\__\___|\___|\__|_| \_/ \___|
-                                                                       
-                                                                       
+                                                                      
+                                                                      
 EOF
 
 # Array to track missing or failed commands
@@ -46,15 +46,15 @@ run_command "Version details using vcgencmd" "vcgencmd version 2>/dev/null"
 
 print_ip_addresses() {
     ip_addresses=$(hostname -I)
-    
+
     if [ -z "$ip_addresses" ]; then
         echo "No IP addresses found."
         return
     fi
-    
+
     ipv4=()
     ipv6=()
-    
+
     for ip in $ip_addresses; do
         if [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             # If the IP matches IPv4 pattern, add to ipv4 array
@@ -67,13 +67,13 @@ print_ip_addresses() {
             unknown+=("$ip")
         fi
     done
-    
+
     # Function to print a list with a header
     print_list() {
         local header="$1"
         shift
         local list=("$@")
-        
+
         if [ ${#list[@]} -ne 0 ]; then
             echo "$header:"
             for item in "${list[@]}"; do
@@ -82,13 +82,13 @@ print_ip_addresses() {
             echo
         fi
     }
-    
+
     # Print IPv4 Addresses
     print_list "IPv4 Addresses" "${ipv4[@]}"
-    
+
     # Print IPv6 Addresses
     print_list "IPv6 Addresses" "${ipv6[@]}"
-    
+
     # Print Unknown Addresses, if any
     if [ ${#unknown[@]} -ne 0 ]; then
         echo "Unknown IP Addresses:"
@@ -104,7 +104,7 @@ print_ip_addresses
 
 get_home_directories() {
     local home_dirs=()
-    
+
     # Iterate through /etc/passwd to extract home directories
     while IFS=: read -r username _ _ _ _ home_dir _; do
         # Only include directories that exist and start with /home
@@ -223,6 +223,48 @@ check_authorized_keys() {
     echo
 }
 
+# Function to check for available package managers
+check_package_managers() {
+    echo "== Package Managers =="
+
+    declare -A package_managers=(
+        ["APT"]="apt"
+        ["DNF"]="dnf"
+        ["YUM"]="yum"
+        ["Pacman"]="pacman"
+        ["Zypper"]="zypper"
+        ["Snap"]="snap"
+        ["Flatpak"]="flatpak"
+        ["Portage"]="emerge"
+        ["Homebrew"]="brew"
+    )
+
+    found=()
+    not_found=()
+
+    for name in "${!package_managers[@]}"; do
+        cmd=${package_managers[$name]}
+        if command -v "$cmd" >/dev/null 2>&1; then
+            found+=("$name ($cmd)")
+        else
+            not_found+=("$name ($cmd)")
+        fi
+    done
+
+    if [ ${#found[@]} -ne 0 ]; then
+        for pm in "${found[@]}"; do
+            echo "  - $pm"
+        done
+        echo
+    else
+        echo "No known package managers found. We checked for:"
+        for pm in "${!package_managers[@]}"; do
+            echo "  - $pm (${package_managers[$pm]})"
+        done
+        echo
+    fi
+}
+
 # Run the SSH configuration checks, but only if we're running as root
 if [ $(id -u) -eq 0 ]; then
     check_ssh_config
@@ -231,6 +273,9 @@ else
     echo "Skipping SSH configuration checks (requires root privileges)."
     echo
 fi
+
+# Check for available package managers
+check_package_managers
 
 # Print missing or failed commands at the end
 if [ ${#missing_commands[@]} -ne 0 ]; then
