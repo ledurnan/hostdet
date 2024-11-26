@@ -8,8 +8,8 @@ cat << "EOF"
  |  __  |/ _ \/ __| __| | |  | |/ _ \ __/ _ \/ __| __| \ \ / / _ \
  | |  | | (_) \__ \ |_  | |__| |  __/ ||  __/ (__| |_| |\ V /  __/
  |_|  |_|\___/|___/\__| |_____/ \___|\__\___|\___|\__|_| \_/ \___|
-                                                                  
-                                                                  
+                                                                       
+                                                                       
 EOF
 
 # Array to track missing or failed commands
@@ -21,8 +21,8 @@ run_command() {
     local command="$2"
 
     # Execute the command using bash -c to handle pipes and redirections
-    # Suppress stderr by redirecting it to /dev/null
-    output=$(bash -c "$command" 2>/dev/null)
+    # Suppress stderr by redirecting it to /dev/null and remove null bytes
+    output=$(bash -c "$command" 2>/dev/null | tr -d '\0')
 
     # Check if the command succeeded and produced non-empty output
     if [ $? -ne 0 ] || [ -z "$output" ]; then
